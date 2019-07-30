@@ -1,0 +1,45 @@
+# nginx try files 
+# try_files
+# try_files directive can be applied in the server context or inside the location context
+# try_files <filename...> <rewrite>     meaning only the last argument is treated as a rewrite, all the previous one are treated as files under the root directory
+# ===============
+
+events {}
+
+http {
+    include mime.types;
+
+    server {
+        listen 8090;
+        server_name localhost;
+
+        root /home/greg/workspace/my_repos/nginx-udemy/html;
+        
+
+
+        # checks if the thumb.png exists under the 'root' dir
+        # if it does -> serve it
+        # if does not -> serve /greet
+        #try_files /thumb.png /greet; 
+        #try_files /cat.png /greet;         # in this case cat.png does not exist so rewrites to /greet 
+
+        # try the $uri then if cat.png does not exist, /greet does not exist relative to the root directory so rewrites to /friendly_404 
+        #try_files $uri /cat.png /greet /friendly_404;     
+
+        # named locations - use the @ to refer to a location
+        try_files $uri /cat.png /greet @friendly_404;     
+    
+
+
+        location @friendly_404 {
+            return 404 "Sorry, that file could not be found.\n";
+        }
+
+        location /greet {
+            return 200 "Hello User\n";
+        }
+
+
+    }
+
+}
